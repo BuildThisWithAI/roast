@@ -1,101 +1,118 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { type Platform, platforms } from "@/constants";
+import { readStreamableValue } from "ai/rsc";
+import { Flame, Laugh } from "lucide-react";
+import { useState, useTransition } from "react";
+import { roastAction } from "./actions";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+export default function Page() {
+	const [platform, setPlatform] = useState<Platform>("github");
+	const [username, setUsername] = useState("");
+	const [roast, setRoast] = useState("");
+	const [isPending, startTransition] = useTransition();
+
+	const handleRoast = (e: React.FormEvent) => {
+		e.preventDefault();
+		setRoast("");
+		startTransition(async () => {
+			const { output } = await roastAction({ username, platform });
+			for await (const delta of readStreamableValue(output)) {
+				setRoast((currentGeneration) => `${currentGeneration}${delta}`);
+			}
+		});
+	};
+
+	return (
+		<div className="min-h-screen bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center p-4">
+			<Card className="w-full max-w-md">
+				<CardHeader>
+					<CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+						<Flame className="h-6 w-6 text-red-500" />
+						RoastLM
+					</CardTitle>
+					<CardDescription className="text-center">
+						Prepare to get roasted! Enter your username and watch the AI burn.
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<form onSubmit={handleRoast} className="space-y-4">
+						<div className="space-y-2">
+							<label
+								htmlFor="platform"
+								className="text-sm font-medium text-gray-700"
+							>
+								Select Platform
+							</label>
+							<Select
+								onValueChange={(v: Platform) => setPlatform(v)}
+								value={platform}
+							>
+								<SelectTrigger id="platform" className="capitalize">
+									<SelectValue placeholder="Choose a platform" />
+								</SelectTrigger>
+								<SelectContent>
+									{platforms.map((platform) => (
+										<SelectItem
+											key={platform}
+											value={platform}
+											className="capitalize"
+										>
+											{platform}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+						<div className="space-y-2">
+							<label
+								htmlFor="username"
+								className="text-sm font-medium text-gray-700"
+							>
+								Username
+							</label>
+							<Input
+								id="username"
+								placeholder="Enter the username to roast"
+								value={username}
+								onChange={(e) => setUsername(e.target.value)}
+							/>
+						</div>
+						<Button
+							type="submit"
+							disabled={isPending}
+							className="w-full bg-red-500 hover:bg-red-600 transition-colors duration-200"
+						>
+							{isPending ? "Roasting..." : "Roast Me!"}
+						</Button>
+					</form>
+					{roast && (
+						<div className="mt-6 p-4 bg-orange-100 rounded-lg">
+							<h3 className="font-semibold text-red-600 flex items-center gap-2 mb-2">
+								<Laugh className="h-5 w-5" />
+								AI Roast:
+							</h3>
+							<p className="text-gray-800 italic">{roast}</p>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+		</div>
+	);
 }
