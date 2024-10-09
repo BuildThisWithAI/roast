@@ -29,6 +29,7 @@ export async function roastAction({
     (async () => {
       const { textStream } = await streamText({
         model: openai("gpt-4o-mini"),
+
         prompt: `give a short and harsh roasting for the following ${platform} profile: ${username}. Here are the details: ${data}, mention counts and metrics if possible.`,
       });
 
