@@ -1,118 +1,133 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { type Platform, platforms } from "@/constants";
 import { readStreamableValue } from "ai/rsc";
-import { Flame, Laugh } from "lucide-react";
+import { Copy, CopyCheck, Flame, Laugh } from "lucide-react";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { roastAction } from "./actions";
 
 export default function Page() {
-	const [platform, setPlatform] = useState<Platform>("github");
-	const [username, setUsername] = useState("");
-	const [roast, setRoast] = useState("");
-	const [isPending, startTransition] = useTransition();
+  const [platform, setPlatform] = useQueryState(
+    "platform",
+    parseAsStringLiteral(platforms.map(({ name }) => name)).withDefault("github"),
+  );
+  const [username, setUsername] = useQueryState("username", parseAsString.withDefault(""));
+  const [roast, setRoast] = useState("");
+  const [isPending, startTransition] = useTransition();
 
-	const handleRoast = (e: React.FormEvent) => {
-		e.preventDefault();
-		setRoast("");
-		startTransition(async () => {
-			const { output } = await roastAction({ username, platform });
-			for await (const delta of readStreamableValue(output)) {
-				setRoast((currentGeneration) => `${currentGeneration}${delta}`);
-			}
-		});
-	};
+  const startRoast = () => {
+    startTransition(async () => {
+      const { output } = await roastAction({ username, platform });
+      for await (const delta of readStreamableValue(output)) {
+        setRoast((currentGeneration) => `${currentGeneration}${delta}`);
+      }
+    });
+  };
 
-	return (
-		<div className="min-h-screen bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center p-4">
-			<Card className="w-full max-w-md">
-				<CardHeader>
-					<CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-						<Flame className="h-6 w-6 text-red-500" />
-						RoastLM
-					</CardTitle>
-					<CardDescription className="text-center">
-						Prepare to get roasted! Enter your username and watch the AI burn.
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<form onSubmit={handleRoast} className="space-y-4">
-						<div className="space-y-2">
-							<label
-								htmlFor="platform"
-								className="text-sm font-medium text-gray-700"
-							>
-								Select Platform
-							</label>
-							<Select
-								onValueChange={(v: Platform) => setPlatform(v)}
-								value={platform}
-							>
-								<SelectTrigger id="platform" className="capitalize">
-									<SelectValue placeholder="Choose a platform" />
-								</SelectTrigger>
-								<SelectContent>
-									{platforms.map((platform) => (
-										<SelectItem
-											key={platform}
-											value={platform}
-											className="capitalize"
-										>
-											{platform}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-						<div className="space-y-2">
-							<label
-								htmlFor="username"
-								className="text-sm font-medium text-gray-700"
-							>
-								Username
-							</label>
-							<Input
-								id="username"
-								placeholder="Enter the username to roast"
-								value={username}
-								onChange={(e) => setUsername(e.target.value)}
-							/>
-						</div>
-						<Button
-							type="submit"
-							disabled={isPending}
-							className="w-full bg-red-500 hover:bg-red-600 transition-colors duration-200"
-						>
-							{isPending ? "Roasting..." : "Roast Me!"}
-						</Button>
-					</form>
-					{roast && (
-						<div className="mt-6 p-4 bg-orange-100 rounded-lg">
-							<h3 className="font-semibold text-red-600 flex items-center gap-2 mb-2">
-								<Laugh className="h-5 w-5" />
-								AI Roast:
-							</h3>
-							<p className="text-gray-800 italic">{roast}</p>
-						</div>
-					)}
-				</CardContent>
-			</Card>
-		</div>
-	);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setRoast("");
+    startRoast();
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary/70 to-primary flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+            <Flame className="h-6 w-6 text-primary" />
+            RoastLM
+          </CardTitle>
+          <CardDescription className="text-center">
+            Prepare to get roasted! <br />
+            Enter your username and watch the AI burn.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="platform" className="text-foreground/80">
+                Select Platform
+              </Label>
+              <Select onValueChange={(v: Platform) => setPlatform(v)} value={platform}>
+                <SelectTrigger id="platform" className="capitalize">
+                  <SelectValue placeholder="Choose a platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  {platforms.map(({ name, label, icon: Icon }) => (
+                    <SelectItem key={name} value={name}>
+                      <div className="flex items-center">
+                        <Icon className="h-5 w-5" />
+                        <span className="ml-2">{label}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="platform" className="text-foreground/80">
+                Username
+              </Label>
+              <Input
+                id="username"
+                placeholder="Enter the username to roast"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={isPending || username === ""}
+              className="w-full bg-red-500 hover:bg-red-600 transition-colors duration-200"
+            >
+              {isPending ? "Roasting..." : "Roast Me!"}
+            </Button>
+          </form>
+          {roast && (
+            <div className="mt-6 p-4 bg-orange-100 rounded-lg">
+              <div className="flex justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Laugh className="h-5 w-5" />
+                  <h3 className="font-semibold text-red-600 ">AI Roast:</h3>
+                </div>
+                <CopyButton />
+              </div>
+              <p className="text-gray-800 italic">{roast}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function CopyButton() {
+  const [isCopied, setIsCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        navigator.clipboard.writeText(location.href);
+        setIsCopied(true);
+        toast.success("Copied to clipboard!");
+        setTimeout(() => setIsCopied(false), 2000);
+      }}
+    >
+      {isCopied ? <CopyCheck className="size-4" /> : <Copy className="size-4" />}
+    </button>
+  );
 }
