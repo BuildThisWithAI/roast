@@ -1,9 +1,11 @@
 "use client";
 
+import { Reddit, XOutlined } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -11,11 +13,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type Platform, platforms } from "@/constants";
+import { type Platform, platforms, siteConfig } from "@/constants";
 import { readStreamableValue } from "ai/rsc";
-import { Copy, CopyCheck, Flame, Laugh } from "lucide-react";
+import {
+  Copy,
+  CopyCheck,
+  Facebook,
+  Flame,
+  Laugh,
+  Linkedin,
+  LinkedinIcon,
+  LucideFacebook,
+  Share,
+  Share2,
+  XIcon,
+} from "lucide-react";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState, useTransition } from "react";
+import {
+  FacebookIcon,
+  FacebookMessengerIcon,
+  FacebookMessengerShareButton,
+  FacebookShareButton,
+  LinkedinShareButton,
+  RedditShareButton,
+  TwitterIcon,
+  TwitterShareButton,
+  WhatsappIcon,
+  WhatsappShareButton,
+} from "react-share";
 import { toast } from "sonner";
 import { roastAction } from "./actions";
 
@@ -104,7 +130,10 @@ export default function Page() {
                   <Laugh className="h-5 w-5" />
                   <h3 className="font-semibold text-red-600 ">AI Roast:</h3>
                 </div>
-                <CopyButton />
+                <div className="flex items-center gap-2">
+                  <CopyButton text={roast} />
+                  <ShareButton />
+                </div>
               </div>
               <p className="text-gray-800 italic">{roast}</p>
             </div>
@@ -115,13 +144,58 @@ export default function Page() {
   );
 }
 
-function CopyButton() {
+function ShareButton() {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger>
+        <Share2 className="mr-2 h-4 w-4" />
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <h3 className="font-medium leading-none">Share this website</h3>
+          <p className="text-sm text-muted-foreground">Choose a social media platform.</p>
+          <div className="grid grid-cols-2 gap-2">
+            <TwitterShareButton
+              url={siteConfig.url}
+              title={siteConfig.name}
+              className="group"
+              hashtags={["roastlm", "ai"]}
+            >
+              <span className="flex items-center gap-2 group-hover:bg-muted p-2 rounded-md border">
+                <XOutlined className="size-5" /> Twitter
+              </span>
+            </TwitterShareButton>
+            <LinkedinShareButton
+              url={siteConfig.url}
+              title={siteConfig.name}
+              summary={siteConfig.description}
+              className="group"
+            >
+              <span className="flex items-center gap-2 group-hover:bg-muted p-2 rounded-md border">
+                <LinkedinIcon className="size-5" /> Linkedin
+              </span>
+            </LinkedinShareButton>
+            <FacebookShareButton url={siteConfig.url} hashtag="#roastlm" className="group">
+              <span className="flex items-center gap-2 group-hover:bg-muted p-2 rounded-md border">
+                <LucideFacebook className="size-5" /> Facebook
+              </span>
+            </FacebookShareButton>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function CopyButton({ text }: { text: string }) {
   const [isCopied, setIsCopied] = useState(false);
   return (
     <button
       type="button"
+      title="Copy text"
       onClick={() => {
-        navigator.clipboard.writeText(location.href);
+        navigator.clipboard.writeText(text);
         setIsCopied(true);
         toast.success("Copied to clipboard!");
         setTimeout(() => setIsCopied(false), 2000);
