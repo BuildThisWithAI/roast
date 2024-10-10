@@ -1,11 +1,16 @@
 "use client";
 
-import { Reddit, XOutlined } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -14,34 +19,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type Platform, platforms, siteConfig } from "@/constants";
+import { env } from "@/env.mjs";
 import { readStreamableValue } from "ai/rsc";
-import {
-  Copy,
-  CopyCheck,
-  Facebook,
-  Flame,
-  Laugh,
-  Linkedin,
-  LinkedinIcon,
-  LucideFacebook,
-  Share,
-  Share2,
-  XIcon,
-} from "lucide-react";
-import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
-import { useState, useTransition } from "react";
+import { Copy, CopyCheck, Flame, Laugh } from "lucide-react";
 import {
   FacebookIcon,
-  FacebookMessengerIcon,
-  FacebookMessengerShareButton,
   FacebookShareButton,
+  LinkedinIcon,
   LinkedinShareButton,
+  RedditIcon,
   RedditShareButton,
   TwitterIcon,
   TwitterShareButton,
-  WhatsappIcon,
-  WhatsappShareButton,
-} from "react-share";
+} from "next-share";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { roastAction } from "./actions";
 
@@ -130,61 +122,49 @@ export default function Page() {
                   <Laugh className="h-5 w-5" />
                   <h3 className="font-semibold text-red-600 ">AI Roast:</h3>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CopyButton text={roast} />
-                  <ShareButton />
-                </div>
+                <CopyButton text={roast} />
               </div>
               <p className="text-gray-800 italic">{roast}</p>
             </div>
           )}
         </CardContent>
+        <CardFooter className="flex justify-center">
+          <ShareButton />
+        </CardFooter>
       </Card>
     </div>
   );
 }
 
 function ShareButton() {
-  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger>
-        <Share2 className="mr-2 h-4 w-4" />
-      </PopoverTrigger>
-      <PopoverContent className="w-80">
-        <div className="grid gap-4">
-          <h3 className="font-medium leading-none">Share this website</h3>
-          <p className="text-sm text-muted-foreground">Choose a social media platform.</p>
-          <div className="grid grid-cols-2 gap-2">
-            <TwitterShareButton
-              url={siteConfig.url}
-              title={siteConfig.name}
-              className="group"
-              hashtags={["roastlm", "ai"]}
-            >
-              <span className="flex items-center gap-2 group-hover:bg-muted p-2 rounded-md border">
-                <XOutlined className="size-5" /> Twitter
-              </span>
-            </TwitterShareButton>
-            <LinkedinShareButton
-              url={siteConfig.url}
-              title={siteConfig.name}
-              summary={siteConfig.description}
-              className="group"
-            >
-              <span className="flex items-center gap-2 group-hover:bg-muted p-2 rounded-md border">
-                <LinkedinIcon className="size-5" /> Linkedin
-              </span>
-            </LinkedinShareButton>
-            <FacebookShareButton url={siteConfig.url} hashtag="#roastlm" className="group">
-              <span className="flex items-center gap-2 group-hover:bg-muted p-2 rounded-md border">
-                <LucideFacebook className="size-5" /> Facebook
-              </span>
-            </FacebookShareButton>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+    <div className="flex gap-2 items-center">
+      <TwitterShareButton
+        url={env.NEXT_PUBLIC_APP_URL}
+        title={siteConfig.name}
+        hashtags={["roastlm", "ai"]}
+        className="bg-black"
+      >
+        <TwitterIcon size={32} round />
+      </TwitterShareButton>
+      <LinkedinShareButton
+        url={env.NEXT_PUBLIC_APP_URL}
+        title={siteConfig.name}
+        summary={siteConfig.description}
+      >
+        <LinkedinIcon size={32} round />
+      </LinkedinShareButton>
+      <FacebookShareButton
+        url={env.NEXT_PUBLIC_APP_URL}
+        hashtag="#roastlm"
+        quote={siteConfig.description}
+      >
+        <FacebookIcon size={32} round />
+      </FacebookShareButton>
+      <RedditShareButton url={env.NEXT_PUBLIC_APP_URL} title={siteConfig.name}>
+        <RedditIcon size={32} round />
+      </RedditShareButton>
+    </div>
   );
 }
 

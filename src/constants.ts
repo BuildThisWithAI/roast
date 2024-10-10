@@ -24,5 +24,4 @@ export type Platform = (typeof platforms)[number]["name"];
 export const siteConfig = {
   name: "RoastLM",
   description: "Prepare to get roasted with AI! Enter your username and watch the AI burn.",
-  url: "https://roastlm.vercel.app",
 } as const;
