@@ -6,10 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "fmt": "pnpm biome format . --write && pnpm biome check . --write"
+    "fmt": "pnpm biome format . --write && pnpm biome check . --write",
+    "ui": "pnpm dlx shadcn@latest"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.66",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",
@@ -19,9 +21,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.447.0",
     "next": "14.2.14",
-    "next-share": "^0.27.0",
     "next-themes": "^0.3.0",
-    "nuqs": "^1.20.0",
     "react": "^18",
     "react-dom": "^18",
     "sonner": "^1.5.0",

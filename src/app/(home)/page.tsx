@@ -1,5 +1,6 @@
 "use client";
 
+import { Reddit, XOutlined } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,36 +27,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type Platform, platforms, siteConfig } from "@/constants";
-import { env } from "@/env.mjs";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { readStreamableValue } from "ai/rsc";
-import { Copy, CopyCheck, Flame, Laugh } from "lucide-react";
-import {
-  FacebookIcon,
-  FacebookShareButton,
-  LinkedinIcon,
-  LinkedinShareButton,
-  RedditIcon,
-  RedditShareButton,
-  TwitterIcon,
-  TwitterShareButton,
-} from "next-share";
-import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
+import { Copy, CopyCheck, FacebookIcon, Flame, Laugh, LinkedinIcon, Share2 } from "lucide-react";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { roastAction } from "./actions";
+import { roastAction } from "../actions";
+import {
+  generateFacebookShareUrl,
+  generateLinkedinShareUrl,
+  generateRedditShareUrl,
+  generateTwitterShareUrl,
+} from "@/lib/utils";
+import { env } from "@/env.mjs";
 
 export default function Page() {
-  const [platform, setPlatform] = useQueryState(
-    "platform",
-    parseAsStringLiteral(platforms.map(({ name }) => name)).withDefault("github"),
-  );
-  const [username, setUsername] = useQueryState("username", parseAsString.withDefault(""));
-  const [roast, setRoast] = useState("");
+  const [platform, setPlatform] = useState<Platform>("github");
+  const [username, setUsername] = useState<string | undefined>();
+  const [roast, setRoast] = useState<string | undefined>();
   const [isPending, startTransition] = useTransition();
 
   const startRoast = () => {
     startTransition(async () => {
-      const { output } = await roastAction({ username, platform });
+      const { output } = await roastAction({ username: username ?? "", platform });
       for await (const delta of readStreamableValue(output)) {
         setRoast((currentGeneration) => `${currentGeneration}${delta}`);
       }
@@ -103,13 +105,13 @@ export default function Page() {
               <Input
                 id="username"
                 placeholder="Enter the username to roast"
-                value={username}
+                value={username ?? undefined}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <Button
               type="submit"
-              disabled={isPending || username === ""}
+              disabled={isPending}
               className="w-full bg-red-500 hover:bg-red-600 transition-colors duration-200"
             >
               {isPending ? "Roasting..." : "Roast Me!"}
@@ -122,15 +124,15 @@ export default function Page() {
                   <Laugh className="h-5 w-5" />
                   <h3 className="font-semibold text-red-600 ">AI Roast:</h3>
                 </div>
-                <CopyButton text={roast} />
+                <div className="flex items-center gap-2">
+                  <CopyButton text={roast} />
+                  <ShareButton />
+                </div>
               </div>
               <p className="text-gray-800 italic">{roast}</p>
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <ShareButton />
-        </CardFooter>
       </Card>
     </div>
   );
@@ -138,33 +140,55 @@ export default function Page() {
 
 function ShareButton() {
   return (
-    <div className="flex gap-2 items-center">
-      <TwitterShareButton
-        url={env.NEXT_PUBLIC_APP_URL}
-        title={siteConfig.name}
-        hashtags={["roastlm", "ai"]}
-        className="bg-black"
-      >
-        <TwitterIcon size={32} round />
-      </TwitterShareButton>
-      <LinkedinShareButton
-        url={env.NEXT_PUBLIC_APP_URL}
-        title={siteConfig.name}
-        summary={siteConfig.description}
-      >
-        <LinkedinIcon size={32} round />
-      </LinkedinShareButton>
-      <FacebookShareButton
-        url={env.NEXT_PUBLIC_APP_URL}
-        hashtag="#roastlm"
-        quote={siteConfig.description}
-      >
-        <FacebookIcon size={32} round />
-      </FacebookShareButton>
-      <RedditShareButton url={env.NEXT_PUBLIC_APP_URL} title={siteConfig.name}>
-        <RedditIcon size={32} round />
-      </RedditShareButton>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Share2 className="size-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Share roast</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link
+            href={generateTwitterShareUrl(env.NEXT_PUBLIC_APP_URL)}
+            className="flex items-center gap-2"
+            target="_blank"
+          >
+            <XOutlined className="stroke-2" />
+            <span>Twitter</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link
+            href={generateLinkedinShareUrl(env.NEXT_PUBLIC_APP_URL)}
+            className="flex items-center gap-2"
+            target="_blank"
+          >
+            <LinkedinIcon className="size-4 stroke-2" />
+            <span>LinkedIn</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link
+            href={generateFacebookShareUrl(env.NEXT_PUBLIC_APP_URL)}
+            className="flex items-center gap-2"
+            target="_blank"
+          >
+            <FacebookIcon className="size-4" />
+            <span>Facebook</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link
+            href={generateRedditShareUrl(env.NEXT_PUBLIC_APP_URL)}
+            className="flex items-center gap-2"
+            target="_blank"
+          >
+            <Reddit />
+            <span>Reddit</span>
+          </Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
