@@ -26,6 +26,9 @@ importers:
       '@t3-oss/env-nextjs':
         specifier: ^0.11.1
         version: 0.11.1(typescript@5.6.2)(zod@3.23.8)
+      '@unkey/ratelimit':
+        specifier: ^0.4.5
+        version: 0.4.5
       ai:
         specifier: ^3.4.9
         version: 3.4.9(react@18.3.1)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.11(typescript@5.6.2))(zod@3.23.8)
@@ -704,6 +707,18 @@ packages:
 
   '@types/react@18.3.11':
     resolution: {integrity: sha512-r6QZ069rFTjrEYgFdOck1gK7FLVsgJE7tTz0pQBczlBNUhBNk0MQH4UbnFSwjpQLMkLzgqvBBa+qGpLje16eTQ==}
+
+  '@unkey/api@0.26.2':
+    resolution: {integrity: sha512-huHF5AbX1NL2MJHSfsO1mB9CSA1CgTlgdPUGZgYCll3BOCKRneYiZ2GgYGiWFbtYaUimjaZgHyGnH9fpQlDFjA==}
+
+  '@unkey/error@0.2.0':
+    resolution: {integrity: sha512-DFGb4A7SrusZPP0FYuRIF0CO+Gi4etLUAEJ6EKc+TKYmscL0nEJ2Pr38FyX9MvjI4Wx5l35Wc9KsBjMm9Ybh7w==}
+
+  '@unkey/ratelimit@0.4.5':
+    resolution: {integrity: sha512-L/Qlxm9rjPfawCmTBZfzR+mwtRy/njcKuYHQK7qJ5AnlTGqzHmHk5aW7K9z9hzEz/USm7E+zLwFnjzsvXTWGlw==}
+
+  '@unkey/rbac@0.3.1':
+    resolution: {integrity: sha512-Hj+52XRIlBBl3/qOUq9K71Fwy3PWExBQOpOClVYHdrcmbgqNL6L4EdW/BzliLhqPCdwZTPVSJTnZ3Hw4ZYixsQ==}
 
   '@vue/compiler-core@3.5.11':
     resolution: {integrity: sha512-PwAdxs7/9Hc3ieBO12tXzmTD+Ln4qhT/56S+8DvrrZ4kLDn4Z/AMUr8tXJD0axiJBS0RKIoNaR0yMuQB9v9Udg==}
@@ -1980,6 +1995,23 @@ snapshots:
     dependencies:
       '@types/prop-types': 15.7.13
       csstype: 3.1.3
+
+  '@unkey/api@0.26.2':
+    dependencies:
+      '@unkey/rbac': 0.3.1
+
+  '@unkey/error@0.2.0':
+    dependencies:
+      zod: 3.23.8
+
+  '@unkey/ratelimit@0.4.5':
+    dependencies:
+      '@unkey/api': 0.26.2
+
+  '@unkey/rbac@0.3.1':
+    dependencies:
+      '@unkey/error': 0.2.0
+      zod: 3.23.8
 
   '@vue/compiler-core@3.5.11':
     dependencies:

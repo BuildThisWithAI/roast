@@ -2,6 +2,7 @@
 
 import type { Platform } from "@/constants";
 import { Roaster } from "@/lib/roaster";
+import { unkey } from "@/lib/unkey.ratelimit";
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { createStreamableValue } from "ai/rsc";
@@ -11,6 +12,10 @@ export async function roastAction({
   platform,
 }: { username: string; platform: Platform }) {
   try {
+    const ratelimit = await unkey.limit(JSON.stringify({ username, platform }));
+    if (!ratelimit.success) {
+      throw new Error("Ratelimit exceeded");
+    }
     let data = "";
     const roaster = new Roaster(username);
 
@@ -31,7 +36,6 @@ export async function roastAction({
     (async () => {
       const { textStream } = await streamText({
         model: openai("gpt-4o-mini"),
-
         prompt:
           platform === "linkedin"
             ? `give a short and harsh roasting from this text: ${data}`
