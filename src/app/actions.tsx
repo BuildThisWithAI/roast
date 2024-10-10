@@ -23,6 +23,8 @@ export async function roastAction({
     } else if (platform === "reddit") {
       const user = await roaster.reddit();
       data = JSON.stringify(user);
+    } else if (platform === "linkedin") {
+      data = await roaster.linkedin();
     }
     const stream = createStreamableValue("");
 
@@ -30,7 +32,10 @@ export async function roastAction({
       const { textStream } = await streamText({
         model: openai("gpt-4o-mini"),
 
-        prompt: `give a short and harsh roasting for the following ${platform} profile: ${username}. Here are the details: ${data}, mention counts and metrics if possible.`,
+        prompt:
+          platform === "linkedin"
+            ? `give a short and harsh roasting from this text: ${data}`
+            : `give a short and harsh roasting for the following ${platform} profile: ${username}. Here are the details: ${data}, mention counts and metrics if possible.`,
       });
 
       for await (const delta of textStream) {

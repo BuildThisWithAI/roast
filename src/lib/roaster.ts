@@ -1,3 +1,5 @@
+import { env } from "@/env.mjs";
+
 export class Roaster {
   constructor(private readonly username: string) {}
 
@@ -44,10 +46,20 @@ export class Roaster {
     const comments = await fetch(`https://www.reddit.com/user/${this.username}/comments.json`).then(
       (res) => res.json(),
     );
-    const data = {
+
+    return {
       about,
       comments,
     };
-    return data;
+  }
+  async linkedin() {
+    const username = this.username.startsWith("https://www.linkedin.com/in/")
+      ? this.username.replace("https://www.linkedin.com/in/", "")
+      : this.username;
+    const url = new URL("/linkedin", env.ROAST_LINKEDIN_API);
+    url.searchParams.append("username", username);
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.roast;
   }
 }

@@ -6,6 +6,7 @@ export const env = createEnv({
   server: {
     YOUTUBE_API_KEY: z.string().min(1),
     OPENAI_API_KEY: z.string().min(1),
+    ROAST_LINKEDIN_API: z.string().url(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
