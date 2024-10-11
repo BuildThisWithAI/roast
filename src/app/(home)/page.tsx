@@ -187,6 +187,15 @@ function ShareButton() {
             <span>Reddit</span>
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            navigator.clipboard.writeText(env.NEXT_PUBLIC_APP_URL);
+            toast.success("Link copied to clipboard!");
+          }}
+          className="flex items-center gap-2"
+        >
+          <Copy className="size-4" /> Copy link
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -201,7 +210,7 @@ function CopyButton({ text }: { text: string }) {
       onClick={() => {
         navigator.clipboard.writeText(text);
         setIsCopied(true);
-        toast.success("Copied to clipboard!");
+        toast.success("Roast copied to clipboard!");
         setTimeout(() => setIsCopied(false), 2000);
       }}
     >
