@@ -2,14 +2,7 @@
 
 import { Reddit, XOutlined } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type Platform, platforms, siteConfig } from "@/constants";
+import { type Platform, platforms } from "@/constants";
+import { env } from "@/env.mjs";
+import {
+  generateFacebookShareUrl,
+  generateLinkedinShareUrl,
+  generateRedditShareUrl,
+  generateTwitterShareUrl,
+} from "@/lib/utils";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { readStreamableValue } from "ai/rsc";
 import { Copy, CopyCheck, FacebookIcon, Flame, Laugh, LinkedinIcon, Share2 } from "lucide-react";
@@ -34,13 +34,6 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { roastAction } from "../actions";
-import {
-  generateFacebookShareUrl,
-  generateLinkedinShareUrl,
-  generateRedditShareUrl,
-  generateTwitterShareUrl,
-} from "@/lib/utils";
-import { env } from "@/env.mjs";
 
 export default function Page() {
   const [platform, setPlatform] = useState<Platform>("github");

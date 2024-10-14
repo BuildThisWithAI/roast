@@ -62,4 +62,18 @@ export class Roaster {
     const data = await res.json();
     return data.roast;
   }
+  async twitter() {
+    const url = new URL("/twitter", env.ROAST_LINKEDIN_API);
+    url.searchParams.append("username", this.username);
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.roast;
+  }
+  async instagram() {
+    const url = new URL("/instagram", env.ROAST_LINKEDIN_API);
+    url.searchParams.append("username", this.username);
+    const res = await fetch(url);
+    const data = await res.json();
+    return data;
+  }
 }

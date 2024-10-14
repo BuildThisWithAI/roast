@@ -1,5 +1,5 @@
-import { Reddit } from "@/components/icons";
-import { GithubIcon, LinkedinIcon, YoutubeIcon } from "lucide-react";
+import { Reddit, XOutlined } from "@/components/icons";
+import { GithubIcon, InstagramIcon, LinkedinIcon, YoutubeIcon } from "lucide-react";
 
 export const platforms = [
   {
@@ -21,6 +21,16 @@ export const platforms = [
     name: "linkedin",
     label: "LinkedIn",
     icon: LinkedinIcon,
+  },
+  {
+    name: "twitter",
+    label: "Twitter",
+    icon: XOutlined,
+  },
+  {
+    name: "instagram",
+    label: "Instagram",
+    icon: InstagramIcon,
   },
 ] as const;
 
