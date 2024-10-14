@@ -41,7 +41,7 @@ export async function roastAction({
       const prompt =
         platform === "linkedin" || platform === "twitter"
           ? `give a short and harsh roasting from this text: ${data}`
-          : `give a short and harsh roasting for the following ${platform} profile: ${username}. Here are the details: ${JSON.stringify(data)}, mention follower count if possible.`;
+          : `give a short and harsh roasting for the following ${platform} profile: ${username}. Here are the details: ${JSON.stringify(data)}, mention counts and metrics if possible.`;
       const { textStream } = await streamText({
         model: openai("gpt-4o-mini"),
         prompt,
