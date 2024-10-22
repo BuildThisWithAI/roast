@@ -6,13 +6,15 @@ import { unkey } from "@/lib/unkey.ratelimit";
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { createStreamableValue } from "ai/rsc";
+import { headers } from "next/headers";
 
 export async function roastAction({
   username,
   platform,
 }: { username: string; platform: Platform }) {
+  const ipAddress = headers().get("x-forwarded-for") || "127.0.0.1";
   try {
-    const ratelimit = await unkey.limit(JSON.stringify({ username, platform }));
+    const ratelimit = await unkey.limit(ipAddress);
     if (!ratelimit.success) {
       throw new Error("Ratelimit exceeded");
     }
