@@ -15,6 +15,7 @@ const openai = createOpenAI({
   headers: {
     "Helicone-Auth": `Bearer ${env.HELICONE_API_KEY}`,
     "Helicone-Property-App": process.env.NODE_ENV === "production" ? "roastlm" : "roastlm-dev",
+    "Helicone-Cache-Enabled": "true",
   },
 });
 
