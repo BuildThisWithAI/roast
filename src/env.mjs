@@ -8,6 +8,7 @@ export const env = createEnv({
     OPENAI_API_KEY: z.string().min(1),
     ROAST_LINKEDIN_API: z.string().url(),
     UNKEY_ROOT_KEY: z.string().startsWith("unkey_"),
+    HELICONE_API_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),

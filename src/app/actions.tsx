@@ -1,12 +1,22 @@
 "use server";
 
 import type { Platform } from "@/constants";
+import { env } from "@/env.mjs";
 import { Roaster } from "@/lib/roaster";
 import { unkey } from "@/lib/unkey.ratelimit";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { headers } from "next/headers";
+
+const openai = createOpenAI({
+  apiKey: env.OPENAI_API_KEY,
+  baseURL: "https://oai.helicone.ai/v1",
+  headers: {
+    "Helicone-Auth": `Bearer ${env.HELICONE_API_KEY}`,
+    "Helicone-Property-App": process.env.NODE_ENV === "production" ? "roastlm" : "roastlm-dev",
+  },
+});
 
 export async function roastAction({
   username,
